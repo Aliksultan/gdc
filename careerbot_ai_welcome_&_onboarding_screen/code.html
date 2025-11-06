@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Career Assistant Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2b8cee",
+              "background-light": "#f6f7f8",
+              "background-dark": "#101922",
+            },
+            fontFamily: {
+              "display": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 antialiased">
+<div class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden p-4 sm:p-6 lg:p-8">
+<div class="absolute inset-0 z-[-1]">
+<div class="absolute inset-0 bg-background-light dark:bg-background-dark"></div>
+<div class="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-primary/10 dark:from-primary/20 to-transparent"></div>
+</div>
+<div class="w-full max-w-2xl">
+<header class="flex items-center justify-between py-6">
+<div class="flex items-center gap-3 text-gray-800 dark:text-white">
+<div class="text-primary text-2xl">
+<svg class="feather feather-briefcase" fill="none" height="28" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="28" xmlns="http://www.w3.org/2000/svg"><rect height="14" rx="2" ry="2" width="20" x="2" y="7"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+</div>
+<h2 class="text-lg font-bold tracking-tight">Career Assistant</h2>
+</div>
+<button class="flex h-9 cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 text-sm font-semibold text-gray-700 dark:text-gray-200 transition-colors hover:bg-gray-100 dark:hover:bg-gray-700">
+<span class="truncate">Login</span>
+</button>
+</header>
+<main class="w-full rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-background-dark/50 shadow-sm backdrop-blur-md">
+<div class="p-6 sm:p-8">
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-gray-600 dark:text-gray-400">Step 1 of 3</p>
+<p class="text-sm font-semibold text-primary">Academic Background</p>
+</div>
+<div class="rounded-full bg-gray-200 dark:bg-gray-700">
+<div class="h-1.5 rounded-full bg-primary" style="width: 33%;"></div>
+</div>
+</div>
+<div class="pt-8 text-center">
+<h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">Craft Your Future.</h1>
+<p class="mt-2 text-base text-gray-600 dark:text-gray-400">Tell us a bit about yourself to get a personalized career roadmap in minutes.</p>
+</div>
+<form class="mt-8 space-y-6">
+<div>
+<label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200" for="university">University</label>
+<div class="mt-2">
+<input class="block w-full rounded-md border-0 bg-gray-100 dark:bg-gray-800 py-2.5 px-3 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-200 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 transition" id="university" name="university" placeholder="e.g., University of Technology" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200" for="major">Major</label>
+<div class="mt-2">
+<input class="block w-full rounded-md border-0 bg-gray-100 dark:bg-gray-800 py-2.5 px-3 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-200 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 transition" id="major" name="major" placeholder="e.g., Computer Science" type="text"/>
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200" for="graduation-year">Expected Graduation Year</label>
+<div class="mt-2">
+<input class="block w-full rounded-md border-0 bg-gray-100 dark:bg-gray-800 py-2.5 px-3 text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-200 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 transition" id="graduation-year" name="graduation-year" placeholder="e.g., 2025" type="number"/>
+</div>
+</div>
+<div class="flex items-center justify-end pt-4">
+<button class="flex h-11 min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary px-6 text-sm font-bold text-white shadow-lg transition-all hover:bg-primary/90" type="button">
+<span>Next</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</main>
+</div>
+</div>
+</body></html>
