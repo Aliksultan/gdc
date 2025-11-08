@@ -1,6 +1,9 @@
 "use client";
 
-import { useAppSelector } from "@/lib/hooks";
+import { useUser } from "@/lib/getUser";
+import { useEffect, useState } from "react";
+import { db } from "@/lib/firebase/clientApp";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import {
   Card,
   CardContent,
@@ -17,22 +20,74 @@ import {
   MapPin,
   GraduationCap,
   Briefcase,
+  Loader2,
 } from "lucide-react";
 import Image from "next/image";
+import { User } from "firebase/auth";
 
-export const ProfilePage = () => {
-  const user = useAppSelector((state: any) => state.user);
+interface UserProfile {
+  name: string;
+  email: string;
+  avatar: string;
+  uid: string;
+  selectedCareer?: {
+    title: string;
+  };
+  profileCompletion?: number;
+  developmentTasks?: Array<{ task: string; completed: boolean }>;
+  careerMilestones?: Array<{
+    title: string;
+    description: string;
+    timeframe: string;
+    completed: boolean;
+  }>;
+  careerRoadmap?: any;
+  university?: string;
+  major?: string;
+  graduationYear?: string;
+  gpa?: string;
+  skills?: string[];
+}
 
-  const firstName = user.name?.split(" ")[0] || "there";
+export const ProfilePage = ({ initialUser }: { initialUser: User | null }) => {
+  const [userProfile, setUserProfile] = useState<UserProfile | null>({
+    name: initialUser?.displayName || "",
+    email: initialUser?.email || "",
+    avatar: initialUser?.photoURL || "",
+    uid: initialUser?.uid || "",
+    selectedCareer: {
+      title: "",
+    },
+    profileCompletion: 0,
+    developmentTasks: [],
+    careerMilestones: [],
+    careerRoadmap: {},
+    university: "",
+    major: "",
+    graduationYear: "",
+    gpa: "",
+    skills: [],
+  });
+  const [loading, setLoading] = useState(true);
+
+  if (!userProfile) {
+    return (
+      <main className="flex flex-1 flex-col items-center justify-center p-6">
+        <p className="text-muted-foreground">No profile data available</p>
+      </main>
+    );
+  }
+
+  const firstName = userProfile.name?.split(" ")[0] || "there";
   const completedTasks =
-    user.developmentTasks?.filter((t: any) => t.completed).length || 0;
-  const totalTasks = user.developmentTasks?.length || 0;
+    userProfile.developmentTasks?.filter((t) => t.completed).length || 0;
+  const totalTasks = userProfile.developmentTasks?.length || 0;
   const progressPercentage =
     totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   // Calculate milestone progress
-  const milestones = user.careerMilestones || [];
-  const completedMilestones = milestones.filter((m: any) => m.completed).length;
+  const milestones = userProfile.careerMilestones || [];
+  const completedMilestones = milestones.filter((m) => m.completed).length;
   const milestoneProgress =
     milestones.length > 0
       ? Math.round((completedMilestones / milestones.length) * 100)
@@ -53,22 +108,22 @@ export const ProfilePage = () => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-6">
-              <div className="relative h-24 w-24 rounded-full overflow-hidden">
+              <div className="relative h-24 w-24 rounded-full overflow-hidden bg-muted">
                 <Image
-                  src={user.avatar}
-                  alt={user.name}
+                  src={userProfile.avatar}
+                  alt={userProfile.name}
                   fill
                   className="object-cover"
                 />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold">{user.name}</h2>
-                <p className="text-muted-foreground">{user.email}</p>
-                {user.selectedCareer && (
+                <h2 className="text-2xl font-bold">{userProfile.name}</h2>
+                <p className="text-muted-foreground">{userProfile.email}</p>
+                {userProfile.selectedCareer && (
                   <div className="mt-2 flex items-center gap-2">
                     <Target className="h-4 w-4 text-primary" />
                     <span className="text-sm font-medium text-primary">
-                      {user.selectedCareer.title}
+                      {userProfile.selectedCareer.title}
                     </span>
                   </div>
                 )}
@@ -78,10 +133,10 @@ export const ProfilePage = () => {
                   Profile Completion
                 </p>
                 <p className="text-2xl font-bold text-primary">
-                  {user.profileCompletion}%
+                  {userProfile.profileCompletion || 30}%
                 </p>
                 <Progress
-                  value={user.profileCompletion}
+                  value={userProfile.profileCompletion || 30}
                   className="w-32 mt-2"
                 />
               </div>
@@ -90,7 +145,7 @@ export const ProfilePage = () => {
         </Card>
 
         {/* Career Path Progress */}
-        {user.selectedCareer && (
+        {userProfile.selectedCareer && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -98,7 +153,7 @@ export const ProfilePage = () => {
                 Career Path Progress
               </CardTitle>
               <CardDescription>
-                Your journey to becoming a {user.selectedCareer.title}
+                Your journey to becoming a {userProfile.selectedCareer.title}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -162,14 +217,14 @@ export const ProfilePage = () => {
               )}
 
               {/* Roadmap Timeline */}
-              {user.careerRoadmap && (
+              {userProfile.careerRoadmap && (
                 <div>
                   <h3 className="font-semibold mb-3 flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-primary" />
                     Roadmap Timeline
                   </h3>
                   <div className="space-y-4">
-                    {Object.entries(user.careerRoadmap).map(
+                    {Object.entries(userProfile.careerRoadmap).map(
                       ([period, tasks]: [string, any]) => (
                         <div key={period} className="border rounded-lg p-4">
                           <h4 className="font-semibold mb-3 capitalize">
@@ -263,30 +318,30 @@ export const ProfilePage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {user.university && (
+              {userProfile.university && (
                 <div>
                   <p className="text-xs text-muted-foreground">University</p>
-                  <p className="font-medium">{user.university}</p>
+                  <p className="font-medium">{userProfile.university}</p>
                 </div>
               )}
-              {user.major && (
+              {userProfile.major && (
                 <div>
                   <p className="text-xs text-muted-foreground">Major</p>
-                  <p className="font-medium">{user.major}</p>
+                  <p className="font-medium">{userProfile.major}</p>
                 </div>
               )}
-              {user.graduationYear && (
+              {userProfile.graduationYear && (
                 <div>
                   <p className="text-xs text-muted-foreground">
                     Graduation Year
                   </p>
-                  <p className="font-medium">{user.graduationYear}</p>
+                  <p className="font-medium">{userProfile.graduationYear}</p>
                 </div>
               )}
-              {user.gpa && (
+              {userProfile.gpa && (
                 <div>
                   <p className="text-xs text-muted-foreground">GPA</p>
-                  <p className="font-medium">{user.gpa}</p>
+                  <p className="font-medium">{userProfile.gpa}</p>
                 </div>
               )}
             </CardContent>
@@ -301,9 +356,9 @@ export const ProfilePage = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {user.skills && user.skills.length > 0 ? (
+              {userProfile.skills && userProfile.skills.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {user.skills.map((skill: string, idx: number) => (
+                  {userProfile.skills.map((skill: string, idx: number) => (
                     <span
                       key={idx}
                       className="px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium"
@@ -323,4 +378,4 @@ export const ProfilePage = () => {
       </div>
     </main>
   );
-}
+};

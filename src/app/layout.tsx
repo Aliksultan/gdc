@@ -3,6 +3,10 @@ import { Manrope } from "next/font/google";
 import "./globals.css";
 import AppProviders from "./providers";
 import { Header } from "@/marketing/header";
+import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
+import { User } from "firebase/auth";
+
+export const dynamic = "force-dynamic";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -16,25 +20,15 @@ export const metadata: Metadata = {
     "A comprehensive career guidance platform that helps students and professionals explore careers, build resumes, practice interviews, and track their development journey.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { currentUser } = await getAuthenticatedAppForUser();
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          async
-          crossOrigin="anonymous"
-          src="https://tweakcn.com/live-preview.min.js"
-        />
-      </head>
       <body
         className={`${manrope.variable} min-h-dvh antialiased flex flex-col`}
       >
         <AppProviders>
-          <Header />
+          <Header initialUser={currentUser?.toJSON() as User | null} />
           <main className="flex-1">{children}</main>
         </AppProviders>
       </body>

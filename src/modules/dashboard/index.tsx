@@ -44,17 +44,22 @@ export const DashboardPage = () => {
   const [showCareerModal, setShowCareerModal] = useState(false);
   const [careerDetails, setCareerDetails] = useState<any>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [greeting, setGreeting] = useState("Hello");
 
   // Get first name for personalized greeting
   const firstName = user.name?.split(" ")[0] || "there";
 
-  // Get time-based greeting
-  const getGreeting = () => {
+  // Get time-based greeting (client-side only to avoid hydration mismatch)
+  useEffect(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
+    if (hour < 12) {
+      setGreeting("Good morning");
+    } else if (hour < 18) {
+      setGreeting("Good afternoon");
+    } else {
+      setGreeting("Good evening");
+    }
+  }, []);
 
   const handleToggleTask = (index: number) => {
     dispatch(toggleTask(index));
@@ -305,7 +310,7 @@ export const DashboardPage = () => {
           <div className="flex flex-wrap justify-between gap-3 p-4 animate-fade-in">
             <div className="flex min-w-72 flex-col gap-2">
               <p className="text-3xl lg:text-4xl font-black leading-tight tracking-tight">
-                {getGreeting()}, {firstName}! 👋
+                {greeting}, {firstName}! 👋
               </p>
               <p className="text-muted-foreground text-base font-normal leading-normal">
                 {user.major

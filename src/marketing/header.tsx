@@ -10,6 +10,13 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { NavLink } from "./navlink";
+import {
+  onIdTokenChanged,
+  signInWithGoogle,
+  signOut,
+} from "@/lib/firebase/auth";
+import { User } from "firebase/auth";
+import { setCookie, deleteCookie } from "cookies-next";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -19,17 +26,46 @@ const navLinks = [
   // { href: "/profile", label: "Profile" },
 ];
 
-export const Header = () => {
-  const pathname = usePathname();
-  const user = useAppSelector((state) => state.user);
+function useUserSession(initialUser: User | null) {
+  useEffect(() => {
+    return onIdTokenChanged(async (user: User | null) => {
+      if (user) {
+        const idToken = await user.getIdToken();
+        await setCookie("__session", idToken);
+      } else {
+        await deleteCookie("__session");
+      }
+      if (initialUser?.uid === user?.uid) {
+        return;
+      }
+      window.location.reload();
+    });
+  }, [initialUser]);
+
+  return initialUser;
+}
+
+export const Header = ({ initialUser }: { initialUser: User | null }) => {
+  const user = useUserSession(initialUser);
+
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  const initials = getInitials(user.name, user.email);
+  const initials = getInitials(user?.displayName || "", user?.email || "");
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleSignOut = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    signOut();
+  };
+
+  const handleSignIn = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    signInWithGoogle();
+  };
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -78,12 +114,10 @@ export const Header = () => {
 
         <div className="flex items-center gap-2">
           {!user ? (
-            <Button asChild>
-              <Link href="/signin">Sign in</Link>
-            </Button>
+            <Button onClick={handleSignIn}>Sign in with Google</Button>
           ) : (
             <Button variant="ghost" asChild className="px-2">
-              <Link href="/account" className="flex items-center gap-2">
+              <Link href="/profile" className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
